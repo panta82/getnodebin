@@ -1,6 +1,6 @@
 # getnodebin
 
-Very simple script to install node binary distributions on local system. 
+Very simple script to install node binary distributions on linux systems. 
 
 ## Requirements
 
