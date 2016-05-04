@@ -76,19 +76,19 @@ verify() {
 install() {
 	local machine="$(uname -m)"
 	local filename="${FILENAME_PREFIX}${VERSION}"
-	if [[ $machine = 'x86_64']]; then
+	if [[ $machine = 'x86_64' ]]; then
 		filename="${filename}${FILENAME_SUFFIX_64}"
 	else
 		filename="${filename}${FILENAME_SUFFIX_86}"
 	fi
-	local url="${URL_PREFIX}${VERSION}/$filename"
+	local url="${URL_ROOT}${VERSION}/$filename"
 	local install_dir=$PREFIX/$INSTALL_DIR
 	
 	mkdir -p $install_dir
 
 	echo -e "\nDownloading $url"
 	rm -f "$install_dir/$filename"
-	wget -Oq "$install_dir/$filename" "$url"
+	wget -q -O"$install_dir/$filename" "$url"
 
 	echo -e "Unpacking $install_dir/$filename"
 	local unpacked_directory=$(tar --exclude="*/*" -tf $install_dir/$filename| head -n 1)
@@ -100,10 +100,12 @@ install() {
 	echo "$PREFIX" > "$unpacked_path/target"
 	cp -f "$THIS_DIR/deploy.sh" "$unpacked_path/"
 
-	echo -e "Deploying..."
 	"$unpacked_path/deploy.sh"
 
-	echo -e "\nnode v$VERSION installed\n"
+	echo -e "Cleaning up"
+	rm -f "$install_dir/$filename"
+
+	echo -e "\nDone. Node v$VERSION was installed under $PREFIX\n"
 }
 
 load_version $@

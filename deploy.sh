@@ -43,15 +43,20 @@ _deploy_dir() {
 	dir="$1"
 	echo "    Deploying $dir..."
 	mkdir -p $TARGET/$dir 
-	cp -arv $THIS_DIR/$dir/. $TARGET/$dir/
+	if [[ ! -z $VERBOSE ]]; then
+		cp -arv $THIS_DIR/$dir/. $TARGET/$dir/
+	else
+		cp -ar $THIS_DIR/$dir/. $TARGET/$dir/
+	fi
 }
 
 deploy() {
+	echo -e "Deploying to $TARGET"
 	_deploy_dir bin
 	_deploy_dir lib
 	_deploy_dir share
 	_deploy_dir include
-	echo -e "\nDeploy done\n"
+	echo -e "Deploy done"
 }
 
 load_target $@
