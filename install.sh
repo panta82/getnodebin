@@ -21,6 +21,8 @@ fatal() {
 
 usage() {
 	cat <<END
+getnodebin - Install node binary distributions on linux
+
 Usage:
 
     $0 <version> [prefix]
@@ -34,6 +36,14 @@ Where:
       recommended is "/home/user/local".
 
 END
+}
+
+try_display_help() {
+	local arg="$1"
+	if [[ $arg = '-h' || $arg = '--help' ]]; then
+		usage
+		exit 0
+	fi
 }
 
 load_version() {
@@ -108,6 +118,7 @@ install() {
 	echo -e "\nDone. Node v$VERSION was installed under $PREFIX\n"
 }
 
+try_display_help $@
 load_version $@
 load_prefix $@
 verify
