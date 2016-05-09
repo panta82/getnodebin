@@ -1,7 +1,7 @@
 #!/bin/bash
 
 THIS_DIR="$(dirname "$(readlink -f "$0")")"
-INSTALL_DIR="node_install"
+VERSIONS_DIR="versions"
 
 URL_ROOT="https://nodejs.org/dist/v"
 FILENAME_PREFIX="node-v"
@@ -92,7 +92,7 @@ install() {
 		filename="${filename}${FILENAME_SUFFIX_86}"
 	fi
 	local url="${URL_ROOT}${VERSION}/$filename"
-	local install_dir=$PREFIX/$INSTALL_DIR
+	local install_dir=$THIS_DIR/$VERSIONS_DIR
 	
 	mkdir -p $install_dir
 

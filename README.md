@@ -22,9 +22,8 @@ Eg.
 
 `<target>` defaults to `/usr/local`.
 
-All downloaded versions can be found under `<target>/node_install` (eg `/usr/local/node_install`).
-At any time, you can go there and reinstall any of the downoaded versions by running the `./deploy.sh`
-script inside appropriate directory.
+All downloaded versions can be found under the `versions` subdirectory of wherever you cloned this project (eg `/usr/local/getnodebin/versions`).
+At any time, you can go there and reinstall any of the downoaded versions by running the local `./deploy.sh` script.
 
 If you want multiple node versions, and don't want to mess with your `PATH` variable,
 this is a reasonable way to do it. 
