@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 THIS_DIR="$(dirname "$(readlink -f "$0")")"
 VERSIONS_DIR="versions"
