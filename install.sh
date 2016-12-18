@@ -103,7 +103,7 @@ install() {
 	echo -e "Unpacking $install_dir/$filename"
 	local unpacked_directory=$(tar --exclude="*/*" -tf $install_dir/$filename| head -n 1)
 	unpacked_directory=${unpacked_directory%/}
-	( cd $install_dir && tar xaf $install_dir/$filename )
+	( cd $install_dir && tar xf $install_dir/$filename )
 
 	local unpacked_path="${install_dir}/${unpacked_directory}"
 	echo -e "Setting up deployment..."
