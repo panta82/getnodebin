@@ -98,7 +98,7 @@ install() {
 
 	echo -e "\nDownloading $url"
 	rm -f "$install_dir/$filename"
-	wget -q -O"$install_dir/$filename" "$url"
+	wget -4 -q -O"$install_dir/$filename" "$url"
 
 	echo -e "Unpacking $install_dir/$filename"
 	local unpacked_directory=$(tar --exclude="*/*" -tf $install_dir/$filename| head -n 1)
