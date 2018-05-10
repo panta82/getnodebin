@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+THIS_DIR="$(dirname "$(readlink -f "$0")")"
+VERSIONS_DIR=".versions"
+
+VERSION=
+VERSION_DIR=
+
+fatal() {
+	echo "$@" >&2
+	exit 1
+}
+
+usage() {
+	cat <<END
+Usage:
+
+	$0 <version>
+
+Where <version> is one of installed versions.
+You can get the full list using the 'versions' command.
+Call 'install' to add new versions.
+
+END
+}
+
+load_version() {
+	VERSION="${1,,}"
+	if [[ -z $VERSION ]]; then
+		usage
+		fatal "ERROR: Version not supplied"
+	fi
+
+	local machine="$(uname -m)"
+	local suffix=
+	if [[ $machine = 'x86_64' ]]; then
+		suffix='x64'
+	else
+		suffix='x86'
+	fi
+
+	VERSION_DIR="node-v${VERSION}-linux-${suffix}"
+}
+
+verify() {
+	[[ -d "$THIS_DIR/$VERSIONS_DIR" ]] || fatal "ERROR: No versions are installed yet. Call 'install' first."
+	[[ -d "$THIS_DIR/$VERSIONS_DIR/$VERSION_DIR" ]] || fatal "ERROR: Version ${VERSION} is not installed. You can install it by calling '$0/install $VERSION'."
+}
+
+execute() {
+	echo -e "Activating $VERSION..."
+
+	"$THIS_DIR/$VERSIONS_DIR/$VERSION_DIR/deploy"
+	
+	echo -e "Active node version: `node -v`\n"
+}
+
+load_version $@
+verify $@
+execute

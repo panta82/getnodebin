@@ -52,6 +52,11 @@ _deploy_dir() {
 
 deploy() {
 	echo -e "Deploying to $TARGET"
+	
+	# This can sometimes cause "text file busy" error if already exists
+	echo $TARGET/bin/node
+	rm -rf $TARGET/bin/node
+
 	_deploy_dir bin
 	_deploy_dir lib
 	_deploy_dir share

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 THIS_DIR="$(dirname "$(readlink -f "$0")")"
-VERSIONS_DIR="versions"
+VERSIONS_DIR=".versions"
 
 URL_ROOT="https://nodejs.org/dist/v"
 FILENAME_PREFIX="node-v"
@@ -9,10 +9,11 @@ FILENAME_SUFFIX_86="-linux-x86.tar.xz"
 FILENAME_SUFFIX_64="-linux-x64.tar.xz"
 
 VERSION=
-DEFAULT_VERSION= #not used
+DEFAULT_VERSION=lts
 
 PREFIX=
-DEFAULT_PREFIX="/usr/local"
+DEFAULT_USER_PREFIX="${HOME}/local"
+DEFAULT_ROOT_PREFIX="/usr/local"
 
 fatal() {
 	echo "$@" >&2
@@ -25,15 +26,15 @@ getnodebin - Install node binary distributions on linux
 
 Usage:
 
-    $0 <version> [prefix]
+	$0 [version] [prefix]
 
 Where:
-    
-    - <version> is full node version you want installed (eg. "6.0.0").
-    
-    - [prefix] is system "hub" where you want node installed.
-      This defaults to "/usr/local". For local installations,
-      recommended is "/home/user/local".
+	
+	- [version] is full node version you want installed (eg. "8.0.0").
+	  You can also use "lts" and "current". Defaults to LTS.
+	
+	- [prefix] is system "hub" where you want node installed.
+	  This defaults to "/usr/local" for root user and "/home/user/local" for user.
 
 END
 }
@@ -47,8 +48,9 @@ try_display_help() {
 }
 
 load_version() {
-	VERSION="$1"
-	local version_regex='[0-9]+\.[0-9]+\.[0-9]+'
+	VERSION="${1,,}"
+	local version_regex='([0-9]+\.[0-9]+\.[0-9]+)|lts|current'
+
 	if [[ -z "$VERSION" ]]; then
 		VERSION="$DEFAULT_VERSION"
 	fi
@@ -56,15 +58,31 @@ load_version() {
 		usage
 		fatal "ERROR: Version not supplied"
 	fi
+
 	if ! [[ $VERSION =~ $version_regex ]]; then
 		fatal "ERROR: Invalid version string ($VERSION)"
+	fi
+
+	local requested_version="$VERSION"
+	if [[ $VERSION = 'lts' ]]; then
+		VERSION=`curl -s https://nodejs.org/en/ | sed -E -n 's|.*LTS.*data-version="v([^"]+).*|\1|p'`
+	elif [[ $VERSION = 'current' ]]; then
+		VERSION=`curl -s https://nodejs.org/en/ | sed -E -n 's|.*Current.*data-version="v([^"]+).*|\1|p'`
+	fi
+
+	if ! [[ $VERSION =~ $version_regex ]]; then
+		fatal "ERROR: Failed determine current ${requested_version} version from https://nodejs.org"
 	fi
 }
 
 load_prefix() {
 	PREFIX="$2"
 	if [[ -z "$PREFIX" ]]; then
-		PREFIX="$DEFAULT_PREFIX"
+		if [[ "$EUID" -ne 0 ]]; then
+			PREFIX="$DEFAULT_USER_PREFIX"
+		else
+			PREFIX="$DEFAULT_ROOT_PREFIX"
+		fi
 	fi
 	if [[ -z "$PREFIX" ]]; then
 		usage
@@ -81,6 +99,16 @@ verify() {
 	_verify_command wget
 	_verify_command uname
 	_verify_command tar
+
+	while true; do
+		echo "About to install node ${VERSION} to ${PREFIX}"
+		read -p "Proceed? (y/N) > " yn
+		case $yn in
+			[Yy]* ) break;;
+			[Nn]* ) exit;;
+			* ) exit;;
+		esac
+	done
 }
 
 install() {
@@ -108,14 +136,15 @@ install() {
 	local unpacked_path="${install_dir}/${unpacked_directory}"
 	echo -e "Setting up deployment..."
 	echo "$PREFIX" > "$unpacked_path/target"
-	cp -f "$THIS_DIR/deploy.sh" "$unpacked_path/"
+	cp -f "$THIS_DIR/lib/deploy" "$unpacked_path/"
 
-	"$unpacked_path/deploy.sh"
+	"$unpacked_path/deploy"
 
 	echo -e "Cleaning up"
 	rm -f "$install_dir/$filename"
 
 	echo -e "\nDone. Node v$VERSION was installed under $PREFIX\n"
+	echo -e "Active node version: `node -v`\n"
 }
 
 try_display_help $@

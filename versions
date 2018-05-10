@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+THIS_DIR="$(dirname "$(readlink -f "$0")")"
+
+VERSIONS_DIR=".versions"
+
+if [[ ! -d "${THIS_DIR}/${VERSIONS_DIR}" ]] ; then
+	echo "No versions are installed yet. You can do that using the 'install' command."
+	exit
+fi
+
+machine="$(uname -m)"
+suffix=
+if [[ $machine = 'x86_64' ]]; then
+	suffix='x64'
+else
+	suffix='x86'
+fi
+
+ls ${VERSIONS_DIR}/ | sed -E 's|node-v(.*)-linux-'"$suffix"'|\1|' | sort -V
