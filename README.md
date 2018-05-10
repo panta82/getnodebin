@@ -1,37 +1,52 @@
 # getnodebin
 
-Very simple script to install node binary distributions on linux systems. 
+Very simple script to install node binary distributions on linux systems.
+It doesn't mess with your environment at all. All it does is download node binaries where you tell it and switches between them.
+
+Super simple and lightweight alternative for nvm.
 
 ## Requirements
 
 Linux with standard tooling (wget).
 
-Tested on debian.
+Tested on debian. Not tested on Mac at all and likely won't work.
 
-## Usage
+## Installation
 
+Just clone this repo somewhere.
+
+```bash
+mkdir -p ~/local
+cd ~/local
+git clone https://github.com/panta82/getnodebin.git
+cd getnodebin
+# execute commands described below
 ```
-./install.sh <version> <target>
+
+## Usage examples
+
+```bash
+./install 10.0.0          # install 10.0.0 to ~/local
+./install LTS             # install whatever is the current LTS to ~/local
+sudo ./install current    # install whatever is the current stable version to /usr/bin/local
+./install lts ~/test      # install current LTS to ~/test
+
+./versions                # list all installed versions
+./activate 8.11.1         # activate previously installed version 8.11.1
 ```
 
-Eg.
+Note that in order for unprivileged installations to work, you'll need to configure your PATH to include `~/local/bin`.
+If you are not sure what this means, open `~/.bashrc` in your editor and add the following to the end of it:
 
+```bash
+PATH="$HOME/local/bin:$PATH"
 ```
-./install.sh 6.0.0 /home/user/local
-```
 
-`<target>` defaults to `/usr/local`.
-
-All downloaded versions can be found under the `versions` subdirectory of wherever you cloned this project (eg `/usr/local/getnodebin/versions`).
-At any time, you can go there and reinstall any of the downoaded versions by running the local `./deploy.sh` script.
-
-If you want multiple node versions, and don't want to mess with your `PATH` variable,
-this is a reasonable way to do it. 
+Then restart your terminal.
 
 ## Stability
 
-I use this script personally, but it's not all that well tested at the moment. 
-It's doing a lot of `rm`-s, so there's definitely a risk of data or time loss.
+Pretty stable so far. This is just a personal tool though, so...
 
 ### USE AT YOUR OWN RISK!
 
